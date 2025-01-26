@@ -5,54 +5,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/CSS/reset.css">
+    <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="stylesheet" href="/CSS/hover.css">
+    <link rel="stylesheet" href="/CSS/laptop.css">
+    <link rel="stylesheet" href="CSS/tablet.css">
+    <script src="https://kit.fontawesome.com/5e573a0060.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
 
 </head>
 
 <body>
+
     <!-- Header  -->
     <header id="header">
-        <div class="logo">
-            <h1><a href="index.html">Products</a></h1>
-        </div>
+        <h1><a href="index.html">
+                <img src="logo.png" alt="" class="logoscss">
+            </a></h1>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search for products..." />
             <button id="searchButton">Search</button>
-            
+
         </div>
-        <nav id="nav">
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
+
+
+        <div class="icon-cart">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0h8m-8 0-1-4m9 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-9-4h10l2-7H3m2 7L3 4m0 0-.792-3H1" />
+            </svg>
+            <span>0</span>
+        </div>
+
     </header>
+
+    <!-- Main Product Container  -->
+    <div id="products" class="products-contaner productList"></div>
+    <div class="productList">
+    </div>
     
-    <div id="products" class="products-container"></div>
+    <div class="cartTab">
+        <h1>Shopping Cart</h1>
+        <div class="listCart"></div>
+     
+    </div>
     
+
+    <!-- Back & Next Button -->
     <div class="pagination">
         <button id="prev-btn" class="pagination-btn red" disabled>Back</button>
         <button id="next-btn" class="pagination-btn">Next</button>
     </div>
 
     <!-- 20 || 30 || 40 Show Cards Pagination  -->
-    <div class="pagination">
-        <button id="btn-20" class="pagination-btn">Show 20 Products</button>
-        <button id="btn-30" class="pagination-btn">Show 30 Products</button>
-        <button id="btn-40" class="pagination-btn">Show 40 Products</button>
+    <div class="ShowPaginations">
+
+        <div class="showPaginationSecondDiv">
+            <button id="btn-20" class="pagination-btn">Show 20 Products</button>
+            <button id="btn-30" class="pagination-btn">Show 30 Products</button>
+            <button id="btn-40" class="pagination-btn">Show 40 Products</button>
+        </div>
+
     </div>
 
     <!-- Footer  -->
-    <footer id="footer">
-        <div class="footer-content">
-            <p>სერვერი კეთება</p>
-            <div class="social-links">
-                <a href="https://www.facebook.com/toko.kalmaxelidze.7" target="">Facebook</a>
-                <a href="https://x.com/?lang=en&mx=2" target="">Twitter</a>
-                <a href="https://www.instagram.com/tornikkeeeeeeee/" target="">Instagram</a>
-            </div>
-        </div>
+    <footer>
+
+        <section class="footer_nav">
+            <section class="footer_nav">
+                <section class="footer_section ">
+                    <h2 class="footer_nav_caption underline-hover">
+                        Contact
+                    </h2>
+                    <section>
+                        <nav class="footer_nav">
+                            <ul class="footer_ul">
+                                <li class="footer_ul_li margin_top font"><a
+                                        href="https://www.google.com/maps/place/Hotel+Green+Inn/@41.6953156,44.8054889,496m/data=!3m2!1e3!4b1!4m9!3m8!1s0x40440d9103aee33b:0x5fe93c3fb057296c!5m2!4m1!1i2!8m2!3d41.6953156!4d44.8054889!16s%2Fg%2F11tdnq5r8t?entry=ttu&g_ep=EgoyMDI1MDEyMS4wIKXMDSoASAFQAw%3D%3D"
+                                        class="font font underline-effect">Ilia and Nino Nakashidezeebis, Turn 18</a>
+                                </li>
+                                <li class="footer_ul_li"><a href="tel:+995596000015"
+                                        class="font font underline-effect">+
+                                        (995)596 00 00 15</a></li>
+                            </ul>
+                        </nav>
+                        <section class="socialicons">
+                            <a href="https://www.facebook.com/toko.kalmaxelidze.7/">
+                                <i class="fa-brands fa-facebook"></i>
+                            </a>
+                            <a href="tel:59600015" class="socmedia">
+                                <i class="fa-brands fa-twitter"></i>
+                            </a>
+                            <a href="https://www.instagram.com/tornikkeeeeeeee/">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+
+                        </section>
+                    </section>
+                </section>
+
+            </section>
     </footer>
     <script src="script.js"></script>
 </body>

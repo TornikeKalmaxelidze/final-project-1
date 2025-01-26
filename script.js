@@ -1,10 +1,6 @@
 const productsContainer = document.querySelector('#products');
-const prevButton = document.querySelector('#prev-btn');
-const nextButton = document.querySelector('#next-btn');
-
-
 let currentPage = 1;
-let productsPerPage = 10;
+let productsPerPage = 20;
 
 function fetchProducts(page) {
     fetch(`https://dummyjson.com/products?limit=${productsPerPage}&skip=${(page - 1) * productsPerPage}`)
@@ -17,10 +13,12 @@ function fetchProducts(page) {
                 div.innerHTML = `
                     <div class="card">
                         <img src="${product.thumbnail}" alt="${product.title}" style="width:100%">
-                        <h1>${product.title}</h1>
+                        <h1>${product.title.slice(0, 20)}</h1>
                         <p class="price">${product.price}$</p>
-                        <p>${product.description.slice(0, 30)}...</p>
+                        <p>${product.description.slice(0, 20)}...</p>
                         <p><button class="view-product-btn" data-id="${product.id}">View Product</button></p>
+                          <button class="addcardbutton"data-id="${product.id}">Add Product</button>
+
                     </div>
                 `;
                 productsContainer.appendChild(div);
@@ -45,21 +43,32 @@ function fetchProducts(page) {
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
 
-fetch(`https://dummyjson.com/products/${productId}`)
-    .then(response => response.json())
-    .then(product => {
-        document.getElementById('product-thumbnail').src = product.thumbnail;
-        document.getElementById('product-name').textContent = product.title;
-        document.getElementById('product-price').textContent = `${product.price}$`;
-        document.getElementById('product-description').textContent = product.description;
-    })
-    .catch(error => console.error('Error fetching product details:', error));
+if (productId) {
+    fetch(`https://dummyjson.com/products/${productId}`)
+        .then(response => {
+            if (!response.ok) {
+                console.error(`Error: ${response.status} - ${response.statusText}`);
+                throw new Error('Product not found');
+            }
+            return response.json();
+        })
+        .then(product => {
+            // Check if the product has the required properties before using them
+            document.getElementById('product-thumbnail').src = product.thumbnail || 'default-thumbnail.jpg';
+            document.getElementById('product-name').textContent = product.title || 'No title available';
+            document.getElementById('product-price').textContent = `${product.price}$` || 'No price available';
+            document.getElementById('product-description').textContent = product.description || 'No description available';
+        })
+        .catch(error => console.error('Error fetching product details:', error));
+};
 
 
-    const btn20 = document.getElementById('btn-20');
-    const btn30 = document.getElementById('btn-30');
-    const btn40 = document.getElementById('btn-40');
-    // Pagination For Cards 20, 30, 40 
+// Pagination For Cards 20, 30, 40
+const prevButton = document.querySelector('#prev-btn');
+const nextButton = document.querySelector('#next-btn');
+const btn20 = document.getElementById('btn-20');
+const btn30 = document.getElementById('btn-30');
+const btn40 = document.getElementById('btn-40');
 nextButton.addEventListener('click', () => {
     currentPage++;
     fetchProducts(currentPage);
@@ -95,8 +104,8 @@ const productsContainerDifferent = document.getElementById('products');
 const searchInput = document.getElementById('searchInput');
 const searchButton = document.getElementById('searchButton');
 
-let searchQuery = ''; 
-let currentPageSecond = 1; 
+let searchQuery = '';
+let currentPageSecond = 1;
 const resultsPerPage = 10;
 
 function fetchSearchResults(query, page) {
@@ -113,7 +122,7 @@ function fetchSearchResults(query, page) {
 }
 
 function displayProducts(products) {
-    productsContainer.innerHTML = ''; 
+    productsContainer.innerHTML = '';
 
     if (products.length === 0) {
         productsContainer.innerHTML = '<p>No products found.</p>';
@@ -126,48 +135,41 @@ function displayProducts(products) {
         div.innerHTML = `
             <div class="card">
                 <img src="${product.thumbnail}" alt="${product.title}" style="width:100%">
-                <h1>${product.title}</h1>
+                <h1>${product.title.slice(0, 20)}</h1>
                 <p class="price">${product.price}$</p>
-                <p>${product.description.slice(0, 30)}...</p>
+                <p>${product.description.slice(0, 20)}</p>
                   <p><button class="view-product-btn" data-id="${product.id}">View Product</button></p>
             </div>
+                            <button class="addcardbutton"data-id="${product.id}">Add Product</button>
+
         `;
         productsContainer.appendChild(div);
     });
 }
+
+
 // Searched products pagination 
 function handlePagination(totalResults, page) {
-    prevButton.disabled = page === 1; 
+    prevButton.disabled = page === 1;
     nextButton.disabled = page * resultsPerPage >= totalResults;
 }
 
 searchButton.addEventListener('click', () => {
-    searchQuery = searchInput.value.trim(); 
+    searchQuery = searchInput.value.trim();
     if (searchQuery) {
-        currentPage = 1; 
+        currentPage = 1;
         fetchSearchResults(searchQuery, currentPage);
     }
 });
 
-prevButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        fetchSearchResults(searchQuery, currentPage);
-    }
-});
-
-nextButton.addEventListener('click', () => {
-    currentPage++;
-    fetchSearchResults(searchQuery, currentPage);
-});
 
 fetchSearchResults('', currentPage);
 
 const productsContainerSecond = document.getElementById('products');
 const searchInputSecond = document.getElementById('searchInput');
 const searchButtonSecond = document.getElementById('searchButton');
-let searchQuerySecond = ''; 
-let currentPageThird = 1; 
+let searchQuerySecond = '';
+let currentPageThird = 1;
 const resultsPerPageSecond = 10;
 
 function fetchSearchResults(query, page) {
@@ -184,7 +186,7 @@ function fetchSearchResults(query, page) {
 }
 
 function displayProducts(products) {
-    productsContainer.innerHTML = ''; 
+    productsContainer.innerHTML = '';
 
     if (products.length === 0) {
         productsContainer.innerHTML = '<p>No products found.</p>';
@@ -197,20 +199,23 @@ function displayProducts(products) {
         div.innerHTML = `
             <div class="card">
                 <img src="${product.thumbnail}" alt="${product.title}" style="width:100%">
-                <h1>${product.title}</h1>
+                <h1>${product.title.slice(0, 10)}</h1>
                 <p class="price">${product.price}$</p>
-                <p>${product.description.slice(0, 30)}...</p>
+                <p>${product.description.slice(0, 10)}...</p>
                 <p><button class="view-product-btn" data-id="${product.id}">View Product</button></p>
+                <button class="addcardbutton"data-id="${product.id}">Add Product</button>
+           
+                
             </div>
         `;
         productsContainer.appendChild(div);
     });
 
-    attachViewProductEvents(); 
+    attachViewProductEvents();
 }
 
 function handlePagination(totalResults, page) {
-    prevButton.disabled = page === 1; 
+    prevButton.disabled = page === 1;
     nextButton.disabled = page * resultsPerPage >= totalResults;
 }
 
@@ -225,23 +230,21 @@ function attachViewProductEvents() {
 }
 
 searchButton.addEventListener('click', () => {
-    searchQuery = searchInput.value.trim(); 
+    searchQuery = searchInput.value.trim();
     if (searchQuery) {
-        currentPage = 1; 
+        currentPage = 1;
         fetchSearchResults(searchQuery, currentPage);
     }
 });
 
-prevButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        fetchSearchResults(searchQuery, currentPage);
-    }
-});
-
-nextButton.addEventListener('click', () => {
-    currentPage++;
-    fetchSearchResults(searchQuery, currentPage);
-});
 
 fetchSearchResults('', currentPage);
+
+// for cart 
+const iconCartSpan = document.querySelector('.icon-cart span');
+const body = document.querySelector('body');
+
+document.querySelector('.icon-cart').addEventListener('click', () => {
+    body.classList.toggle('showCart');
+});
+
