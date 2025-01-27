@@ -1,45 +1,16 @@
 const productsContainer = document.querySelector('#products');
+const listCart = document.querySelector('.listCart');
+const iconCartSpan = document.querySelector('.icon-cart span');
+const body = document.querySelector('body');
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+
 let currentPage = 1;
 let productsPerPage = 20;
+let cart = [];
+let searchQuery = '';
 
-function fetchProducts(page) {
-    fetch(`https://dummyjson.com/products?limit=${productsPerPage}&skip=${(page - 1) * productsPerPage}`)
-        .then(response => response.json())
-        .then(data => {
-            productsContainer.innerHTML = '';
-            data.products.forEach(product => {
-                const div = document.createElement('div');
-                div.classList.add('product');
-                div.innerHTML = `
-                    <div class="card">
-                        <img src="${product.thumbnail}" alt="${product.title}" style="width:100%">
-                        <h1>${product.title.slice(0, 20)}</h1>
-                        <p class="price">${product.price}$</p>
-                        <p>${product.description.slice(0, 20)}...</p>
-                        <p><button class="view-product-btn" data-id="${product.id}">View Product</button></p>
-                          <button class="addcardbutton"data-id="${product.id}">Add Product</button>
-
-                    </div>
-                `;
-                productsContainer.appendChild(div);
-            });
-
-            // to open single products card to seen product details
-            const viewProductButtons = document.querySelectorAll('.view-product-btn');
-            viewProductButtons.forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const productId = event.currentTarget.getAttribute('data-id');
-
-                    window.open(`second.html?id=${productId}`, '');
-                });
-            });
-
-            prevButton.disabled = page === 1;
-            nextButton.disabled = data.products.length < productsPerPage;
-        })
-        .catch(error => console.error('Error fetching products:', error));
-}
-//  To Open Single Information Window For Products 
+// To seen Products details 
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
 
@@ -53,7 +24,6 @@ if (productId) {
             return response.json();
         })
         .then(product => {
-            // Check if the product has the required properties before using them
             document.getElementById('product-thumbnail').src = product.thumbnail || 'default-thumbnail.jpg';
             document.getElementById('product-name').textContent = product.title || 'No title available';
             document.getElementById('product-price').textContent = `${product.price}$` || 'No price available';
@@ -62,22 +32,14 @@ if (productId) {
         .catch(error => console.error('Error fetching product details:', error));
 };
 
-
-// Pagination For Cards 20, 30, 40
-const prevButton = document.querySelector('#prev-btn');
-const nextButton = document.querySelector('#next-btn');
+// To Open Cart selection
+document.querySelector('.icon-cart').addEventListener('click', () => {
+    body.classList.toggle('showCart');
+});
+// To Open More cards Pagination of 20, 30, 40 
 const btn20 = document.getElementById('btn-20');
 const btn30 = document.getElementById('btn-30');
 const btn40 = document.getElementById('btn-40');
-nextButton.addEventListener('click', () => {
-    currentPage++;
-    fetchProducts(currentPage);
-});
-
-prevButton.addEventListener('click', () => {
-    currentPage--;
-    fetchProducts(currentPage);
-});
 
 btn20.addEventListener('click', () => {
     productsPerPage = 20;
@@ -97,39 +59,39 @@ btn40.addEventListener('click', () => {
     fetchProducts(currentPage);
 });
 
-fetchProducts(currentPage);
+const Loadmore = document.getElementById('loadbutton');
 
-// Search pagination 
-const productsContainerDifferent = document.getElementById('products');
-const searchInput = document.getElementById('searchInput');
-const searchButton = document.getElementById('searchButton');
+Loadmore.addEventListener('click', () => {
+    productsPerPage++;
+    fetchProducts(currentPage); // Fetch next page of products
+});
 
-let searchQuery = '';
-let currentPageSecond = 1;
-const resultsPerPage = 10;
-
-function fetchSearchResults(query, page) {
-    const skip = (page - 1) * resultsPerPage;
-    const url = `https://dummyjson.com/products/search?q=${query}&limit=${resultsPerPage}&skip=${skip}`;
+// Fetched products
+function fetchProducts(page, query = '') {
+    const skip = (page - 1) * productsPerPage;
+    const url = query
+        ? `https://dummyjson.com/products/search?q=${query}&limit=${productsPerPage}&skip=${skip}`
+        : `https://dummyjson.com/products?limit=${productsPerPage}&skip=${skip}`;
 
     fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
+        .then(response => response.json())
+        .then(data => {
             displayProducts(data.products);
             handlePagination(data.total, page);
         })
-        .catch((error) => console.error('Error fetching search results:', error));
+        .catch(error => console.error('Error fetching products:', error));
 }
 
+// Render products to seen
 function displayProducts(products) {
     productsContainer.innerHTML = '';
 
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         productsContainer.innerHTML = '<p>No products found.</p>';
         return;
     }
 
-    products.forEach((product) => {
+    products.forEach(product => {
         const div = document.createElement('div');
         div.classList.add('product');
         div.innerHTML = `
@@ -137,114 +99,129 @@ function displayProducts(products) {
                 <img src="${product.thumbnail}" alt="${product.title}" style="width:100%">
                 <h1>${product.title.slice(0, 20)}</h1>
                 <p class="price">${product.price}$</p>
-                <p>${product.description.slice(0, 20)}</p>
-                  <p><button class="view-product-btn" data-id="${product.id}">View Product</button></p>
+                <p>${product.description.slice(0, 50)}...</p>
+                <button class="view-product-btn" data-id="${product.id}">View Product</button>
+                <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
             </div>
-                            <button class="addcardbutton"data-id="${product.id}">Add Product</button>
-
         `;
         productsContainer.appendChild(div);
     });
+
+    attachEventListeners();
 }
 
 
-// Searched products pagination 
-function handlePagination(totalResults, page) {
+//  event listeners for buttons
+function attachEventListeners() {
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = parseInt(button.getAttribute('data-id'));
+            addToCart(productId);
+        });
+    });
+
+    document.querySelectorAll('.view-product-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = button.getAttribute('data-id');
+            window.open(`second.html?id=${productId}`, '_blank');
+        });
+    });
+}
+const prevButton = document.querySelector('#prev-btn');
+const nextButton = document.querySelector('#next-btn');
+// back & next page 
+function handlePagination(total, page) {
     prevButton.disabled = page === 1;
-    nextButton.disabled = page * resultsPerPage >= totalResults;
+    nextButton.disabled = page * productsPerPage >= total;
 }
 
-searchButton.addEventListener('click', () => {
-    searchQuery = searchInput.value.trim();
-    if (searchQuery) {
-        currentPage = 1;
-        fetchSearchResults(searchQuery, currentPage);
-    }
+prevButton.addEventListener('click', () => {
+    currentPage--;
+    fetchProducts(currentPage, searchQuery);
 });
 
+nextButton.addEventListener('click', () => {
+    currentPage++;
+    fetchProducts(currentPage, searchQuery);
+});
 
-fetchSearchResults('', currentPage);
+// For SearchBar
+searchButton.addEventListener('click', () => {
+    searchQuery = searchInput.value.trim();
+    currentPage = 1;
+    fetchProducts(currentPage, searchQuery);
+});
 
-const productsContainerSecond = document.getElementById('products');
-const searchInputSecond = document.getElementById('searchInput');
-const searchButtonSecond = document.getElementById('searchButton');
-let searchQuerySecond = '';
-let currentPageThird = 1;
-const resultsPerPageSecond = 10;
-
-function fetchSearchResults(query, page) {
-    const skip = (page - 1) * resultsPerPage;
-    const url = `https://dummyjson.com/products/search?q=${query}&limit=${resultsPerPage}&skip=${skip}`;
-
-    fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-            displayProducts(data.products);
-            handlePagination(data.total, page);
+// Add to cart 
+function addToCart(productId) {
+    fetch(`https://dummyjson.com/products/${productId}`)
+        .then(response => response.json())
+        .then(product => {
+            const cartItem = cart.find(item => item.id === product.id);
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCart();
         })
-        .catch((error) => console.error('Error fetching search results:', error));
+        .catch(error => console.error('Error adding product to cart:', error));
 }
 
-function displayProducts(products) {
-    productsContainer.innerHTML = '';
+//  functional of cart 
+function updateCart() {
+    listCart.innerHTML = '';
+    let totalQuantity = 0;
 
-    if (products.length === 0) {
-        productsContainer.innerHTML = '<p>No products found.</p>';
-        return;
-    }
+    cart.forEach(item => {
+        totalQuantity += item.quantity;
 
-    products.forEach((product) => {
-        const div = document.createElement('div');
-        div.classList.add('product');
-        div.innerHTML = `
-            <div class="card">
-                <img src="${product.thumbnail}" alt="${product.title}" style="width:100%">
-                <h1>${product.title.slice(0, 10)}</h1>
-                <p class="price">${product.price}$</p>
-                <p>${product.description.slice(0, 10)}...</p>
-                <p><button class="view-product-btn" data-id="${product.id}">View Product</button></p>
-                <button class="addcardbutton"data-id="${product.id}">Add Product</button>
-           
-                
+        const cartItemDiv = document.createElement('div');
+        cartItemDiv.classList.add('cart-item');
+        cartItemDiv.innerHTML = `
+            <div class="item-info">
+                <img src="${item.thumbnail}" alt="${item.title}" style="width:50px;">
+                <p>${item.title}</p>
+                <p>${item.price}$ x ${item.quantity}</p>
+            </div>
+            <div class="quantity-controls">
+                <button class="decrease" data-id="${item.id}">-</button>
+                <span>${item.quantity}</span>
+                <button class="increase" data-id="${item.id}">+</button>
             </div>
         `;
-        productsContainer.appendChild(div);
+        listCart.appendChild(cartItemDiv);
     });
 
-    attachViewProductEvents();
-}
+    iconCartSpan.innerText = totalQuantity;
 
-function handlePagination(totalResults, page) {
-    prevButton.disabled = page === 1;
-    nextButton.disabled = page * resultsPerPage >= totalResults;
-}
+    document.querySelectorAll('.decrease').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = parseInt(button.getAttribute('data-id'));
+            changeQuantity(productId, -1);
+        });
+    });
 
-function attachViewProductEvents() {
-    const viewProductButtons = document.querySelectorAll('.view-product-btn');
-    viewProductButtons.forEach((button) => {
-        button.addEventListener('click', (event) => {
-            const productId = event.currentTarget.getAttribute('data-id');
-            window.location.href = `second.html?id=${productId}`;
+    document.querySelectorAll('.increase').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = parseInt(button.getAttribute('data-id'));
+            changeQuantity(productId, 1);
         });
     });
 }
 
-searchButton.addEventListener('click', () => {
-    searchQuery = searchInput.value.trim();
-    if (searchQuery) {
-        currentPage = 1;
-        fetchSearchResults(searchQuery, currentPage);
+// Change cart quantity
+function changeQuantity(productId, change) {
+    const cartItem = cart.find(item => item.id === productId);
+    if (!cartItem) return;
+
+    cartItem.quantity += change;
+    if (cartItem.quantity <= 0) {
+        cart = cart.filter(item => item.id !== productId);
     }
-});
+
+    updateCart();
+}
 
 
-fetchSearchResults('', currentPage);
-
-// for cart 
-const iconCartSpan = document.querySelector('.icon-cart span');
-const body = document.querySelector('body');
-
-document.querySelector('.icon-cart').addEventListener('click', () => {
-    body.classList.toggle('showCart');
-});
-
+fetchProducts(currentPage);
