@@ -1,0 +1,30 @@
+@media (max-width: 768px) {
+    .cartTab{
+        width: 200px;
+      
+    }
+    #header {
+        padding-inline: 20px;
+    }
+    .logoscss {
+        width: 70px;
+    }
+    .checkout-container {
+        flex-direction: column;
+    }
+
+    .cart-summary,
+    .checkout-form {
+        flex: none;
+        width: 100%;
+    }
+    
+  }
+  
+/* mobile */
+@media only screen and (max-width: 768px) {
+    .listProduct{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+ 
