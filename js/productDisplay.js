@@ -47,6 +47,26 @@ function displayProducts(products) {
     attachEventListeners();
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('id');
+
+if (productId) {
+    fetch(`https://dummyjson.com/products/${productId}`)
+        .then(response => {
+            if (!response.ok) {
+                console.error(`Error: ${response.status} - ${response.statusText}`);
+                throw new Error('Product not found');
+            }
+            return response.json();
+        })
+        .then(product => {
+            document.getElementById('product-thumbnail').src = product.thumbnail || 'default-thumbnail.jpg';
+            document.getElementById('product-name').textContent = product.title || 'No title available';
+            document.getElementById('product-price').textContent = `${product.price}$` || 'No price available';
+            document.getElementById('product-description').textContent = product.description || 'No description available';
+        })
+        .catch(error => console.error('Error fetching product details:', error));
+};
 function attachEventListeners() {
     document.querySelectorAll('.add-to-cart-btn').forEach(button => {
         button.addEventListener('click', () => {
@@ -58,7 +78,7 @@ function attachEventListeners() {
     document.querySelectorAll('.view-product-btn').forEach(button => {
         button.addEventListener('click', () => {
             const productId = button.getAttribute('data-id');
-            window.open(`second.html?id=${productId}`, '_blank');
+            window.open(`second.html?id=${productId}`,);
         });
     });
 }
